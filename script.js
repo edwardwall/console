@@ -20,7 +20,7 @@ function input() {
     document.body.innerHTML +=
         "<form id=form autocomplete=off>" +
         "<div class=path><span class=blue>" + path + "</span>&nbsp;$</div>" +
-        "<input type=text id=input>" +
+        "<input type=text id=input autocorrect=off autocapitalize=none>" +
         "</form>";
 
     document.getElementById("form").addEventListener("submit", function(event) {
@@ -46,27 +46,30 @@ function execute(command) {
             output = "Permission denied";
         }
 
+    } else if ("" == command) {
+
+    } else if ("ascii" == command) {
+        ascii();
+
+    } else if ("cat" == command || command.startsWith("cat ")) {
+        output = cat(command.substring("cat ".length));
+
+    } else if ("cd" == command || command.startsWith("cd ")) {
+        output = changedir(command.substring("cd ".length));
+
     } else if ("clear" == command) {
         document.body.innerHTML = "";
         input();
         return;
 
-    } else if ("" == command) {
-
-    } else if ("cd" == command || command.startsWith("cd ")) {
-        output = changedir(command.substring("cd ".length));
-
-    } else if ("ls" == command) {
-        output = ("" == dir ? Object.keys(map) : map[dir]).join(indent);
-
     } else if ("exit" == command) {
         location = "https://edwardwall.me/";
 
-    } else if ("help" == command) {
-        output = ["Available commands:", "ascii", "clear", "cd", "exit", "ls", "help"].join( indent);
+    } else if ("ls" == command) {
+        output = ("" == dir ? Object.keys(map) : Object.keys(map[dir])).join(indent);
 
-    } else if ("ascii" == command) {
-        ascii();
+    } else if ("help" == command) {
+        output = ["Available commands:", "ascii", "cat", "cd", "clear", "exit", "ls", "help"].join(indent);
 
     } else {
         output = encode(command) + ": command not found";
@@ -92,6 +95,32 @@ function execute(command) {
 
 }
 
+function cat(file) {
+
+    if ("" == file) {
+        return "usage: cat [file]";
+    }
+
+    let value;
+
+    if ("" == dir) {
+        value = map[file];
+    } else {
+        value = map[dir][file];
+    }
+
+    if ("string" == typeof value) {
+        return value;
+
+    } else if ("object" == typeof value || "." == file || ".." == file) {
+        return "cat: " + encode(file) + ": Is a directory";
+
+    } else {
+        return "cat: " + encode(file) + ": No such file";
+    }
+
+}
+
 function changedir(newDir) {
 
     if ("." == newDir) {
@@ -105,13 +134,22 @@ function changedir(newDir) {
 
     try {
 
-        if ("" != dir) { // cannot change to another dir if already in one
-            throw "";
+        if ("" != dir) {
+
+            if ("string" == typeof map[dir][newDir]) {
+                return "cd: " + encode(newDir) + ": Not a directory";
+            }
+
+            throw "Can't change to another dir if already in one";
         }
 
-        let len = map[newDir].length; // will throw if dir does not exist
-        dir = newDir;
-        return "";
+        if ("object" == typeof map[newDir]) {
+            dir = newDir;
+            return "";
+
+        } else {
+            throw "no such file or directory";
+        }
 
     } catch (e) {
         return encode(newDir) + ": No such directory";
@@ -131,8 +169,8 @@ function encode(string) {
 
 var dir = "";
 var map = {
-    blog: [],
-    projects: []
+    blog: {},
+    projects: {}
 };
 
 // to begin

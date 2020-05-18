@@ -1,10 +1,14 @@
 body {
     margin:0;
-    padding:1em 2em;
+    padding:1em;
     font-size:16px;
     font-family:monospace;;
     background-color:black;
     color:white;
+}
+pre {
+    font-size:.5em;
+    text-align:center;
 }
 .invisible {
     color:black;
@@ -26,4 +30,13 @@ input, .input {
     background-color:black;
     color:white;
     width:calc(100% - 15em);
+}
+@media (min-width:450px) {
+    body {
+        padding:1em 2em;
+    }
+    pre {
+        font-size:1em;
+        text-align:left;
+    }
 }
