@@ -110,6 +110,11 @@ function cat(file) {
     }
 
     if ("string" == typeof value) {
+
+        if ("" === value) {
+            window.location = "https://edwardwall.me/" + file;
+        }
+
         return value;
 
     } else if ("object" == typeof value || "." == file || ".." == file) {
@@ -169,7 +174,13 @@ function encode(string) {
 
 var dir = "";
 var map = {
-    blog: {},
+    blog: {
+        "cloudflare-san-scan": "",
+        "browsealoud-users-are-still-vulnerable": "",
+        "subdomain-takeover": "",
+        "channel-4-data-leak": "",
+        "ministry-of-defence-domain-hijacking": ""
+    },
     projects: {}
 };
 
